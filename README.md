@@ -1,0 +1,2 @@
+# GSSHG
+Glorious SSH! Games
