@@ -1,6 +1,6 @@
 package tui
 
-func (m model) View() string {
+func (m Model) View() string {
 
 	s := "Hello World\n\n"
 

@@ -2,11 +2,19 @@ package tui
 
 import tea "github.com/charmbracelet/bubbletea"
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	println("Message: " + m.msg)
 
-	m.msg = msg.(string)
+	switch tmsg := msg.(type) {
+
+	case tea.WindowSizeMsg:
+
+		m.msg = "tea window message"
+
+	case string:
+		m.msg = tmsg
+	}
 
 	return m, nil
 

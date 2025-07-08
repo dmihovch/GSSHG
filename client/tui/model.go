@@ -4,11 +4,15 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type model struct {
+type Model struct {
 	msg string
 }
 
-func (m model) Init() tea.Cmd {
+func CreateModel() tea.Model {
+	return Model{msg: "Hello"}
+}
+
+func (m Model) Init() tea.Cmd {
 
 	return nil
 }
