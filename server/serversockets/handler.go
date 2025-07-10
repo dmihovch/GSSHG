@@ -1,6 +1,7 @@
 package serversockets
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -28,6 +29,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			break
 		}
+
+		fmt.Println("msg from client: " + "{" + string(msg) + "}")
 
 		err = conn.WriteMessage(websocket.TextMessage, []byte("Hey idiot: "+string(msg)))
 		if err != nil {
