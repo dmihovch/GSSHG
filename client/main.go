@@ -6,8 +6,6 @@ import (
 	"gsshg/client/game"
 	"log"
 	"os"
-
-	"github.com/gorilla/websocket"
 )
 
 func main() {
@@ -26,16 +24,6 @@ func main() {
 	}
 	defer player.Conn.Close()
 
-	err = player.Conn.WriteMessage(websocket.TextMessage, []byte("Hello from client!"))
-	if err != nil {
-		log.Fatalln(err)
-	}
-	_, msg, err := player.Conn.ReadMessage()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	fmt.Println("server says: " + string(msg))
-
 	lnReader := bufio.NewReader(os.Stdin)
 
 	for {
@@ -50,10 +38,13 @@ func main() {
 			break
 		}
 
-		err = player.Conn.WriteMessage(websocket.TextMessage, []byte(msg))
-		if err != nil {
-			log.Fatalln(err)
+		if msg == "w\n" {
+			err = player.WriteJson(&game.JSONPayload{Type: "raise", Data: "200"})
+			if err != nil {
+				log.Fatalln(err)
+			}
 		}
+
 	}
 
 }

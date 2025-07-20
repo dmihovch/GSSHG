@@ -16,3 +16,11 @@ func (p *Player) ConnectToServer(url string) error {
 	p.Conn = conn
 	return nil
 }
+
+func (p *Player) WriteTextMessage(msg string) error {
+	return p.Conn.WriteMessage(websocket.TextMessage, []byte(msg))
+}
+
+func (p *Player) WriteJson(payload *JSONPayload) error {
+	return p.Conn.WriteJSON(payload)
+}
