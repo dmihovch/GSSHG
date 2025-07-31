@@ -12,6 +12,7 @@ type Client struct {
 	Conn     *websocket.Conn
 	ToClient chan []byte
 	Actions  chan Action
+	State    *PlayerState
 }
 
 func CreateClient(conn *websocket.Conn) *Client {
@@ -23,14 +24,13 @@ func CreateClient(conn *websocket.Conn) *Client {
 	}
 }
 
-type GameState struct {
+type ConnectionPool struct {
 	Players map[string]*PlayerState
 }
 
 type Action struct {
-	PlayerID string
-	Type     string
-	Payload  json.RawMessage
+	Type    string
+	Payload json.RawMessage
 }
 
 type PlayerState struct {
