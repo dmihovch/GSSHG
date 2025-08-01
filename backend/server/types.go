@@ -2,25 +2,32 @@ package server
 
 import (
 	"encoding/json"
+	"sync"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
 type Client struct {
-	ID       string
-	Conn     *websocket.Conn
-	ToClient chan []byte
-	Actions  chan Action
-	State    *PlayerState
+	ScreenName string
+	ID         int
+	Conn       *websocket.Conn
+	ToClient   chan []byte
+	Actions    chan Action
+	State      *PlayerState
 }
 
-func CreateClient(conn *websocket.Conn) *Client {
+func CreateClient(conn *websocket.Conn, id int, username string) *Client {
 	return &Client{
-		ID:       uuid.New().String(),
-		Conn:     conn,
-		ToClient: make(chan []byte),
-		Actions:  make(chan Action),
+		ScreenName: username,
+		ID:         id,
+		Conn:       conn,
+		ToClient:   make(chan []byte),
+		Actions:    make(chan Action),
+		State: &PlayerState{
+			Hand:   [7]*Card{},
+			Chips:  1000,
+			Folded: false,
+		},
 	}
 }
 
@@ -38,4 +45,14 @@ type PlayerState struct {
 type Card struct {
 	Suit  int
 	Value int
+}
+
+type NewConnection struct {
+	conn     *websocket.Conn
+	username string
+}
+
+type ConnectionPool struct {
+	ConnMap map[int]*Client
+	Mutex   *sync.Mutex
 }
