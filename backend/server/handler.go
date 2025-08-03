@@ -30,17 +30,12 @@ func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("recieved username:", string(msg))
-
 	client := NewConnection{
 		conn:     conn,
 		username: string(msg),
 	}
 
-	fmt.Println(client)
-
 	m.ClientChan <- client
-	fmt.Println("sent client to channel")
 }
 
 /*

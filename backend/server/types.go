@@ -14,6 +14,8 @@ type Client struct {
 	ToClient   chan []byte
 	Actions    chan Action
 	State      *PlayerState
+	IsLeader   bool
+	IsTurn     bool
 }
 
 func CreateClient(conn *websocket.Conn, id int, username string) *Client {
