@@ -6,6 +6,7 @@ import (
 	"gsshg/client/game"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/gorilla/websocket"
 )
@@ -40,7 +41,22 @@ func main() {
 		log.Println(err)
 		return
 	}
+	player.Name = username
 	player.Conn.WriteMessage(websocket.TextMessage, []byte(username))
+
+	_, id, err := player.Conn.ReadMessage()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	playerID, err := strconv.Atoi(string(id))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	player.ID = playerID
+
+	fmt.Println(player.ID, player.Name)
 
 	for {
 

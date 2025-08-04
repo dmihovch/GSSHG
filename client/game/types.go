@@ -4,9 +4,10 @@ import "github.com/gorilla/websocket"
 
 type Player struct {
 	Conn  *websocket.Conn
-	chips int
-	hand  []string
-	name  string
+	Chips int
+	Hand  []string
+	Name  string
+	ID    int
 }
 
 //going to have a list of keybind, if a key is pressed, send message to the server with keypress and current game state (tag each gamestate with an id? idk yet),

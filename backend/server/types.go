@@ -18,19 +18,11 @@ type Client struct {
 	IsTurn     bool
 }
 
-func CreateClient(conn *websocket.Conn, id int, username string) *Client {
-	return &Client{
-		ScreenName: username,
-		ID:         id,
-		Conn:       conn,
-		ToClient:   make(chan []byte),
-		Actions:    make(chan Action),
-		State: &PlayerState{
-			Hand:   [7]*Card{},
-			Chips:  1000,
-			Folded: false,
-		},
-	}
+type Manager struct {
+	Connections *ConnectionPool
+	ClientChan  chan (NewConnection)
+	ServerReady chan (struct{})
+	StartGame   chan (struct{})
 }
 
 type Action struct {
@@ -60,4 +52,9 @@ type ConnectionPool struct {
 	SmallBlindID  int
 	CurrentTurnID int
 	Mutex         *sync.Mutex
+}
+
+type JSONPayload struct {
+	Type string `json:"type"` //type determines which handler is used (eg raise, fold, check, flip)
+	Data string `json:"data"` //determines quantity, whatever else.
 }

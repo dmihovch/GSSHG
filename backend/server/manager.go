@@ -2,14 +2,10 @@ package server
 
 import (
 	"fmt"
-)
+	"strconv"
 
-type Manager struct {
-	Connections *ConnectionPool
-	ClientChan  chan (NewConnection)
-	ServerReady chan (struct{})
-	StartGame   chan (struct{})
-}
+	"github.com/gorilla/websocket"
+)
 
 func (m *Manager) AcceptConnections() {
 
@@ -26,6 +22,7 @@ func (m *Manager) AcceptConnections() {
 			m.Connections.CurrentTurnID = nextID
 		}
 		m.Connections.IDarr = append(m.Connections.IDarr, nextID)
+		m.Connections.ConnMap[nextID].Conn.WriteMessage(websocket.TextMessage, []byte(strconv.Itoa(nextID)))
 		m.Connections.Mutex.Unlock()
 		nextID++
 
@@ -34,6 +31,21 @@ func (m *Manager) AcceptConnections() {
 
 	}
 
+}
+
+func CreateClient(conn *websocket.Conn, id int, username string) *Client {
+	return &Client{
+		ScreenName: username,
+		ID:         id,
+		Conn:       conn,
+		ToClient:   make(chan []byte),
+		Actions:    make(chan Action),
+		State: &PlayerState{
+			Hand:   [7]*Card{},
+			Chips:  1000,
+			Folded: false,
+		},
+	}
 }
 
 func (m *Manager) GameLoop() {
