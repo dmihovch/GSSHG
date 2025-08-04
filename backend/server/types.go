@@ -55,6 +55,9 @@ type NewConnection struct {
 }
 
 type ConnectionPool struct {
-	ConnMap map[int]*Client
-	Mutex   *sync.Mutex
+	ConnMap       map[int]*Client
+	IDarr         []int
+	SmallBlindID  int
+	CurrentTurnID int
+	Mutex         *sync.Mutex
 }

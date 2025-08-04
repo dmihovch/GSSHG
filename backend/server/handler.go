@@ -20,6 +20,7 @@ func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
+
 	//defer conn.Close()
 	fmt.Println("Connection added:", conn.LocalAddr().String())
 
@@ -30,12 +31,10 @@ func (m *Manager) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := NewConnection{
+	m.ClientChan <- NewConnection{
 		conn:     conn,
 		username: string(msg),
 	}
-
-	m.ClientChan <- client
 }
 
 /*
