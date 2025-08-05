@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/gorilla/websocket"
 )
@@ -16,13 +15,12 @@ func (m *Manager) AcceptConnections() {
 		m.Connections.Mutex.Lock()
 		m.Connections.ConnMap[nextID] = CreateClient(client.conn, nextID, client.username)
 		if len(m.Connections.ConnMap) == 1 {
-			m.Connections.ConnMap[nextID].IsLeader = true
+			m.Connections.ConnMap[nextID].IsHost = true
 			m.Connections.ConnMap[nextID].IsTurn = true
 			m.Connections.SmallBlindID = nextID
 			m.Connections.CurrentTurnID = nextID
 		}
 		m.Connections.IDarr = append(m.Connections.IDarr, nextID)
-		m.Connections.ConnMap[nextID].Conn.WriteMessage(websocket.TextMessage, []byte(strconv.Itoa(nextID)))
 		m.Connections.Mutex.Unlock()
 		nextID++
 
@@ -33,26 +31,19 @@ func (m *Manager) AcceptConnections() {
 
 }
 
-func CreateClient(conn *websocket.Conn, id int, username string) *Client {
-	return &Client{
-		ScreenName: username,
-		ID:         id,
-		Conn:       conn,
-		ToClient:   make(chan []byte),
-		Actions:    make(chan Action),
-		State: &PlayerState{
-			Hand:   [7]*Card{},
-			Chips:  1000,
-			Folded: false,
-		},
-	}
+func (m *Manager) MainGameLoop() {
+
+	m.ResetGameState()
+
 }
 
-func (m *Manager) GameLoop() {
-
-	<-m.StartGame
-	for {
-
+func CreateClient(cn *websocket.Conn, id int, un string) *Client {
+	return &Client{
+		ScreenName: un,
+		ID:         id,
+		Conn:       cn,
+		ToClient:   make(chan ([]byte)),
+		Actions:    make(chan (Action)),
+		State:      &PlayerState{},
 	}
-
 }
