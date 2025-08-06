@@ -2,9 +2,6 @@ package server
 
 import (
 	"fmt"
-	"strconv"
-
-	"github.com/gorilla/websocket"
 )
 
 func (m *Manager) AcceptConnections() {
@@ -16,26 +13,17 @@ func (m *Manager) AcceptConnections() {
 		m.Connections.Mutex.Lock()
 		m.Connections.ConnMap[nextID] = CreateClient(client.conn, nextID, client.username)
 		if len(m.Connections.ConnMap) == 1 {
-			m.Connections.ConnMap[nextID].IsLeader = true
+			m.Connections.ConnMap[nextID].IsHost = true
 			m.Connections.ConnMap[nextID].IsTurn = true
 			m.Connections.SmallBlindID = nextID
 			m.Connections.CurrentTurnID = nextID
 		}
 		m.Connections.IDarr = append(m.Connections.IDarr, nextID)
-		m.Connections.ConnMap[nextID].Conn.WriteMessage(websocket.TextMessage, []byte(strconv.Itoa(nextID)))
 		m.Connections.Mutex.Unlock()
 		nextID++
 
 		debugClient := m.Connections.ConnMap[nextID-1]
 		fmt.Println(debugClient.ID, debugClient.ScreenName)
-
-	}
-}
-
-func (m *Manager) GameLoop() {
-
-	<-m.StartGame
-	for {
 
 	}
 

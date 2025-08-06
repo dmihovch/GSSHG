@@ -20,6 +20,7 @@ func main() {
 		ClientChan:  make(chan (server.NewConnection)),
 		ServerReady: make(chan (struct{})),
 		StartGame:   make(chan (struct{})),
+		GameState:   &server.GameState{},
 	}
 	go manager.AcceptConnections()
 	<-manager.ServerReady

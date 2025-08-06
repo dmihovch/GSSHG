@@ -14,7 +14,7 @@ type Client struct {
 	ToClient   chan []byte //or this
 	Actions    chan Action //don't think I need this
 	State      *PlayerState
-	IsLeader   bool
+	IsHost     bool
 	IsTurn     bool
 }
 
@@ -23,6 +23,15 @@ type Manager struct {
 	ClientChan  chan (NewConnection)
 	ServerReady chan (struct{})
 	StartGame   chan (struct{})
+	GameState   *GameState
+}
+
+type GameState struct {
+	Started        bool
+	TurnID         int
+	TurnIndex      int
+	CommunityCards [5]*Card
+	Deck           [52]*Card
 }
 
 type Action struct {
@@ -37,8 +46,10 @@ type PlayerState struct {
 }
 
 type Card struct {
-	Suit  int
-	Value int
+	Suit        int
+	Value       int
+	IsCommunity bool
+	IsRevealed  bool
 }
 
 type NewConnection struct {
@@ -48,7 +59,7 @@ type NewConnection struct {
 
 type ConnectionPool struct {
 	ConnMap       map[int]*Client
-	IDarr         []int
+	IDarr         []int //determines the order of the game
 	SmallBlindID  int
 	CurrentTurnID int
 	Mutex         *sync.Mutex
