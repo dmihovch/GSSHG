@@ -30,22 +30,6 @@ func (m *Manager) AcceptConnections() {
 		fmt.Println(debugClient.ID, debugClient.ScreenName)
 
 	}
-
-}
-
-func CreateClient(conn *websocket.Conn, id int, username string) *Client {
-	return &Client{
-		ScreenName: username,
-		ID:         id,
-		Conn:       conn,
-		ToClient:   make(chan []byte),
-		Actions:    make(chan Action),
-		State: &PlayerState{
-			Hand:   [7]*Card{},
-			Chips:  1000,
-			Folded: false,
-		},
-	}
 }
 
 func (m *Manager) GameLoop() {

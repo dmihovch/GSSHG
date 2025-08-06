@@ -11,8 +11,8 @@ type Client struct {
 	ScreenName string
 	ID         int
 	Conn       *websocket.Conn
-	ToClient   chan []byte
-	Actions    chan Action
+	ToClient   chan []byte //or this
+	Actions    chan Action //don't think I need this
 	State      *PlayerState
 	IsLeader   bool
 	IsTurn     bool
