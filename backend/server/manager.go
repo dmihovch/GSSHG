@@ -2,6 +2,9 @@ package server
 
 import (
 	"fmt"
+	"strconv"
+
+	"github.com/gorilla/websocket"
 )
 
 func (m *Manager) AcceptConnections() {
@@ -11,7 +14,8 @@ func (m *Manager) AcceptConnections() {
 	close(m.ServerReady)
 	for client := range m.ClientChan {
 		m.Connections.Mutex.Lock()
-		m.Connections.ConnMap[nextID] = CreateClient(client.conn, nextID, client.username)
+		newClient := CreateClient(client.conn, nextID, client.username)
+		m.Connections.ConnMap[nextID] = newClient
 		if len(m.Connections.ConnMap) == 1 {
 			m.Connections.ConnMap[nextID].IsHost = true
 			m.Connections.ConnMap[nextID].IsTurn = true
@@ -22,9 +26,19 @@ func (m *Manager) AcceptConnections() {
 		m.Connections.Mutex.Unlock()
 		nextID++
 
-		debugClient := m.Connections.ConnMap[nextID-1]
-		fmt.Println(debugClient.ID, debugClient.ScreenName)
+		err := newClient.Conn.WriteMessage(websocket.TextMessage, []byte(strconv.Itoa(nextID-1)))
+		if err != nil {
+			m.DisconnectClient <- newClient
+			fmt.Println(newClient.ID, err)
+		}
+
+		go newClient.WSReader(m.DisconnectClient)
+		go newClient.WSWriter(m.DisconnectClient)
 
 	}
+
+}
+
+func (m *Manager) MainGameLoop() {
 
 }

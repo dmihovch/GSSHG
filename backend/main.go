@@ -17,10 +17,11 @@ func main() {
 			CurrentTurnID: -1,
 			Mutex:         &sync.Mutex{},
 		},
-		ClientChan:  make(chan (server.NewConnection)),
-		ServerReady: make(chan (struct{})),
-		StartGame:   make(chan (struct{})),
-		GameState:   &server.GameState{},
+		ClientChan:       make(chan (server.NewConnection)),
+		ServerReady:      make(chan (struct{})),
+		StartGame:        make(chan (struct{})),
+		GameState:        &server.GameState{},
+		DisconnectClient: make(chan (*server.Client)),
 	}
 	go manager.AcceptConnections()
 	<-manager.ServerReady

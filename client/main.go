@@ -67,6 +67,7 @@ func main() {
 
 		if clientMsg == "q\n" {
 			fmt.Println("disconnecting")
+
 			break
 		}
 
@@ -75,6 +76,12 @@ func main() {
 			if err != nil {
 				log.Fatalln(err)
 			}
+		}
+
+		err = player.WriteTextMessage(clientMsg)
+		if err != nil {
+			log.Println(err)
+			break
 		}
 
 	}

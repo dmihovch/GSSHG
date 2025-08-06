@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -26,12 +25,13 @@ func (c *Client) WSReader(dcChan chan *Client) {
 
 	for {
 
-		msgType, msg, err := c.Conn.ReadMessage()
+		_, msg, err := c.Conn.ReadMessage()
 		if err != nil {
+			fmt.Println(c.ID, err)
 			dcChan <- c
+			return
 		}
-		fmt.Println(msgType)
-		fmt.Println(string(msg))
+		fmt.Println(c.ID, string(msg))
 
 	}
 
@@ -39,23 +39,13 @@ func (c *Client) WSReader(dcChan chan *Client) {
 
 func (c *Client) WSWriter(dcChan chan *Client) {
 
-	ticker := time.NewTicker(30 * time.Second)
-	defer ticker.Stop()
 	for {
-		select {
-		case msg, ok := <-c.ToClient:
-			if !ok {
-				fmt.Println("Channel closed")
-				return
-			}
-			err := c.Conn.WriteMessage(websocket.TextMessage, []byte(msg))
-			if err != nil {
-				dcChan <- c
-				return
-			}
-
-		case <-ticker.C:
-			fmt.Println("hello") //disconnect
+		msg := <-c.ToClient
+		err := c.Conn.WriteMessage(websocket.TextMessage, []byte(msg))
+		if err != nil {
+			fmt.Println(c.ID, err)
+			dcChan <- c
+			return
 		}
 	}
 }

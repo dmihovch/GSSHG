@@ -19,11 +19,12 @@ type Client struct {
 }
 
 type Manager struct {
-	Connections *ConnectionPool
-	ClientChan  chan (NewConnection)
-	ServerReady chan (struct{})
-	StartGame   chan (struct{})
-	GameState   *GameState
+	Connections      *ConnectionPool
+	ClientChan       chan (NewConnection)
+	ServerReady      chan (struct{})
+	StartGame        chan (struct{})
+	GameState        *GameState
+	DisconnectClient chan (*Client)
 }
 
 type GameState struct {
