@@ -3,15 +3,35 @@ package server
 import (
 	"fmt"
 	"strconv"
+	"sync"
 
 	"github.com/gorilla/websocket"
 )
+
+func CreateManager() *Manager {
+	return &Manager{
+		Connections: &ConnectionPool{
+			ConnMap:       make(map[int]*Client),
+			IDarr:         []int{},
+			SmallBlindID:  -1,
+			CurrentTurnID: -1,
+			Mutex:         &sync.Mutex{},
+		},
+		ClientChan: make(chan (NewConnection)),
+		Signals: &SignalChannels{
+			ManagerReader: make(chan (struct{})),
+			StartGame:     make(chan (struct{})),
+		},
+		GameState:        &GameState{},
+		DisconnectClient: make(chan (*Client)),
+	}
+}
 
 func (m *Manager) AcceptConnections() {
 
 	nextID := 0
 	fmt.Println("accepting connections")
-	close(m.ServerReady)
+	close(m.Signals.ManagerReader)
 	for client := range m.ClientChan {
 		m.Connections.Mutex.Lock()
 		newClient := CreateClient(client.conn, nextID, client.username)
@@ -24,14 +44,14 @@ func (m *Manager) AcceptConnections() {
 		}
 		m.Connections.IDarr = append(m.Connections.IDarr, nextID)
 		m.Connections.Mutex.Unlock()
-		nextID++
 
-		err := newClient.Conn.WriteMessage(websocket.TextMessage, []byte(strconv.Itoa(nextID-1)))
+		err := newClient.Conn.WriteMessage(websocket.TextMessage, []byte(strconv.Itoa(nextID)))
 		if err != nil {
 			m.DisconnectClient <- newClient
 			fmt.Println(newClient.ID, err)
 		}
 
+		nextID++
 		go newClient.WSReader(m.DisconnectClient)
 		go newClient.WSWriter(m.DisconnectClient)
 

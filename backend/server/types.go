@@ -21,10 +21,9 @@ type Client struct {
 type Manager struct {
 	Connections      *ConnectionPool
 	ClientChan       chan (NewConnection)
-	ServerReady      chan (struct{})
-	StartGame        chan (struct{})
 	GameState        *GameState
 	DisconnectClient chan (*Client)
+	Signals          *SignalChannels
 }
 
 type GameState struct {
@@ -69,4 +68,9 @@ type ConnectionPool struct {
 type JSONPayload struct {
 	Type string `json:"type"` //type determines which handler is used (eg raise, fold, check, flip)
 	Data string `json:"data"` //determines quantity, whatever else.
+}
+
+type SignalChannels struct {
+	ManagerReader chan (struct{})
+	StartGame     chan (struct{})
 }
