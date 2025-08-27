@@ -55,10 +55,19 @@ func (m *Manager) AcceptConnections() {
 		go newClient.WSReader(m.DisconnectClient)
 		go newClient.WSWriter(m.DisconnectClient)
 
+		if len(m.Connections.ConnMap) == 2 {
+			fmt.Println("closing start game chan")
+			close(m.Signals.StartGame)
+		}
 	}
 
 }
 
 func (m *Manager) MainGameLoop() {
+	<-m.Signals.StartGame
+	fmt.Println("starting game")
+	for _, client := range m.Connections.ConnMap {
+		client.ToClient <- []byte("Hello client " + strconv.Itoa(client.ID))
+	}
 
 }

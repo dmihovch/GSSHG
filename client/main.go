@@ -20,7 +20,7 @@ func main() {
 			}
 	*/
 
-	player := &game.Player{}
+	player := &game.Player{ToServer: make(chan ([]byte))}
 	err := player.ConnectToServer("ws://localhost:8080/ws")
 	if err != nil {
 		log.Fatalln(err)
@@ -58,6 +58,9 @@ func main() {
 
 	fmt.Println(player.ID, player.Name)
 
+	go player.WSReader()
+	go player.WSWriter()
+
 	for {
 
 		clientMsg, err := lnReader.ReadString('\n')
@@ -70,20 +73,16 @@ func main() {
 
 			break
 		}
-
-		if clientMsg == "w\n" {
-			err = player.WriteJson(&game.JSONPayload{Type: "raise", Data: "200"})
-			if err != nil {
-				log.Fatalln(err)
+		/*
+			if clientMsg == "w\n" {
+				err = player.WriteJson(&game.JSONPayload{Type: "raise", Data: "200"})
+				if err != nil {
+					log.Fatalln(err)
+				}
 			}
-		}
+		*/
 
-		err = player.WriteTextMessage(clientMsg)
-		if err != nil {
-			log.Println(err)
-			break
-		}
-
+		player.ToServer <- []byte(clientMsg)
 	}
 
 }

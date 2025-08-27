@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gorilla/websocket"
@@ -23,4 +24,27 @@ func (p *Player) WriteTextMessage(msg string) error {
 
 func (p *Player) WriteJson(payload *JSONPayload) error {
 	return p.Conn.WriteJSON(payload)
+}
+
+func (p *Player) WSReader() {
+	for {
+		_, msg, err := p.Conn.ReadMessage()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		fmt.Println(string(msg))
+	}
+}
+
+func (p *Player) WSWriter() {
+
+	for {
+
+		msg := <-p.ToServer
+		err := p.WriteTextMessage(string(msg))
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+	}
 }

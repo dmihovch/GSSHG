@@ -12,6 +12,7 @@ func main() {
 	go manager.AcceptConnections()
 	<-manager.Signals.ManagerReader
 
+	go manager.MainGameLoop()
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		manager.Handler(w, r)
 	})
